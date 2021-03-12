@@ -1,5 +1,7 @@
 mod image_widget;
+mod pie;
 use image::io::Reader as ImageReader;
+use pie::Pie;
 use std::io;
 use tui::{
     backend::CrosstermBackend,
@@ -38,6 +40,7 @@ fn main() -> Result<(), io::Error> {
                 .color_mode(image_widget::ColorMode::Rgb)
                 .style(Style::default().bg(Color::White))
                 .percent(Some(percent));
+
             let chunks = Layout::default()
                 .direction(Direction::Vertical)
                 .margin(1)
@@ -48,7 +51,8 @@ fn main() -> Result<(), io::Error> {
                 minutes_remaining, seconds_remaining
             )));
 
-            f.render_widget(image_widget, chunks[0]);
+            let pie = Pie::default();
+            f.render_widget(pie, chunks[0]);
             f.render_widget(span, chunks[1]);
         })?;
         sleep(Duration::new(0, 16000000)); //about 60 fps
