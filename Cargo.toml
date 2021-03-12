@@ -1,0 +1,12 @@
+[package]
+name = "pomodoro-cli"
+version = "0.1.0"
+authors = ["PHILIP.KRISTOFFERSEN <philip.kristoffersen.ext@siemensgamesa.com>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+crossterm = "0.19"
+tui = { version = "0.14", default-features = false, features = ['crossterm'] }
+image ="0.23.14"
