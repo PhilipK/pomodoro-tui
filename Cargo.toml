@@ -10,3 +10,5 @@ edition = "2018"
 crossterm = "0.19"
 tui = { version = "0.14", default-features = false, features = ['crossterm'] }
 image ="0.23.14"
+notify-rust = "4.3.0"
+rodio = "0.13.0"
