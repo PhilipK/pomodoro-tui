@@ -1,6 +1,6 @@
 use tui::{
     style::{Color, Style},
-    widgets::{Block, Widget},
+    widgets::Widget,
 };
 
 #[derive(Default)]
@@ -26,13 +26,10 @@ impl Widget for Pie {
                 let cell = buf.get_mut(area.left() + x, area.top() + y);
                 let off = distance - radius;
                 let angle_distance =
-                     angle_between_points((x as f32, y as f32), center) - target_angle;
-                match distance_to_char(off.max(angle_distance /3.0)) {
-                    Some(c) => {
-                        cell.set_char(c)
-                            .set_fg(self.style.fg.or(Some(Color::Red)).unwrap());
-                    }
-                    None => {}
+                    angle_between_points((x as f32, y as f32), center) - target_angle;
+                if let Some(c) = distance_to_char(off.max(angle_distance / 3.0)) {
+                    cell.set_char(c)
+                        .set_fg(self.style.fg.or(Some(Color::Red)).unwrap());
                 }
             }
         }
@@ -46,9 +43,10 @@ fn angle_between_points(center: (f32, f32), other: (f32, f32)) -> f32 {
     let radian = (y - cy).atan2(x - cx);
     let angle = radian * (180. / std::f32::consts::PI) - 90.;
     if angle < 0.0 {
-        return angle + 360.0;
+        angle + 360.0
+    }else{
+        angle
     }
-    return angle;
 }
 
 fn distance_to_char(offset: f32) -> Option<char> {
@@ -64,13 +62,12 @@ fn distance_to_char(offset: f32) -> Option<char> {
     if offset < 0.8 {
         return Some(BLOCK_LIGHT);
     }
-    return None;
+    None
 }
 
 fn distance(p1: (f32, f32), p2: (f32, f32), ratio: f32) -> f32 {
     //d=√((x_2-x_1)²+(y_2-y_1)²)
     let (x1, y1) = p1;
     let (x2, y2) = p2;
-    let distance_squared = ((x2 - x1) * (x2 - x1) * ratio) + (y2 - y1) * (y2 - y1);
-    return distance_squared.sqrt();
+    (((x2 - x1) * (x2 - x1) * ratio) + (y2 - y1) * (y2 - y1)).sqrt()
 }

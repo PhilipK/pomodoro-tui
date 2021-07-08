@@ -1,18 +1,13 @@
-mod image_widget;
 mod pie;
-use image::io::Reader as ImageReader;
 use pie::Pie;
 use std::{env, io};
+use tui::Terminal;
 use tui::{
     backend::CrosstermBackend,
     layout::{Constraint, Direction, Layout},
-    style::{Color, Style},
-    text::{self, Text},
+    style::Color,
+    text::{self},
     widgets::Paragraph,
-};
-use tui::{
-    widgets::{Block, Borders},
-    Terminal,
 };
 
 use notify_rust::Notification;
@@ -55,8 +50,10 @@ fn main() -> Result<(), io::Error> {
                 minutes_remaining, seconds_remaining
             )));
 
-            let mut pie = Pie::default();
-            pie.percent = Some(percent);
+            let mut pie = Pie {
+                percent: Some(percent),
+                ..Pie::default()
+            };
             pie.style.fg = Some(if workmode {
                 Color::Red
             } else {
@@ -65,7 +62,7 @@ fn main() -> Result<(), io::Error> {
             f.render_widget(pie, chunks[0]);
             f.render_widget(span, chunks[1]);
         })?;
-        sleep(Duration::new(0, 16000000)); //about 60 fps
+        sleep(Duration::new(1, 0)); //Update once a second
     }
     terminal.clear()?;
 
@@ -79,15 +76,12 @@ fn main() -> Result<(), io::Error> {
         .unwrap();
 
     // Load a sound from a file, using a path relative to Cargo.toml
-    match File::open("ding.mp3") {
-        Ok(file) => {
-            let (_stream, stream_handle) = rodio::OutputStream::try_default().unwrap();
-            let source = rodio::Decoder::new(BufReader::new(file)).unwrap();
-            stream_handle.play_raw(source.convert_samples()).unwrap();
-            sleep(Duration::new(2, 0)); //about 60 fps
-        }
-        Err(_) => {}
+    if let Ok(file) = File::open("ding.mp3") {
+        let (_stream, stream_handle) = rodio::OutputStream::try_default().unwrap();
+        let source = rodio::Decoder::new(BufReader::new(file)).unwrap();
+        stream_handle.play_raw(source.convert_samples()).unwrap();
+        sleep(Duration::new(2, 0));
     };
-    
+
     Ok(())
 }
