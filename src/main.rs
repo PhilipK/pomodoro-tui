@@ -220,7 +220,6 @@ fn main() -> Result<(), io::Error> {
                     let (_stream, stream_handle) = rodio::OutputStream::try_default().unwrap();
                     let source = rodio::Decoder::new(BufReader::new(file)).unwrap();
                     stream_handle.play_raw(source.convert_samples()).unwrap();
-                    sleep(Duration::new(2, 0));
                 };
                 played_warning = true;
             }
@@ -241,9 +240,10 @@ fn main() -> Result<(), io::Error> {
     // Load a sound from a file, using a path relative to Cargo.toml
     if let Ok(file) = File::open("ding.mp3") {
         let (_stream, stream_handle) = rodio::OutputStream::try_default().unwrap();
+        let duration = mp3_duration::from_file(&file).unwrap();
         let source = rodio::Decoder::new(BufReader::new(file)).unwrap();
         stream_handle.play_raw(source.convert_samples()).unwrap();
-        sleep(Duration::new(2, 0));
+        sleep(duration);
     };
     todays_progress.push(phase);
     save_progress(todays_progress);

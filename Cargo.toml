@@ -13,3 +13,4 @@ tui = { version = "0.16", default-features = false, features = ['crossterm'] }
 notify-rust = "4.3.0"
 rodio = "0.14.0"
 chrono= "*"
+mp3-duration ="*"
