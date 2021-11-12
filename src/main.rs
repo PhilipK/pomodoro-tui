@@ -152,6 +152,7 @@ fn main() -> Result<(), io::Error> {
             Phase::LongBreak => 15.,
         });
 
+    let mut played_warning = false;
     let now = SystemTime::now();
     while now.elapsed().unwrap().as_secs_f32() < total_time_seconds {
         terminal.draw(|f| {
@@ -163,8 +164,7 @@ fn main() -> Result<(), io::Error> {
             let progress_texts: Vec<text::Span> = (&todays_progress)
                 .iter()
                 .map(|phase| {
-                    let short_name =
-                    match phase {
+                    let short_name = match phase {
                         Phase::Work => "\u{2588}\u{2588}\u{2588}\u{2588}\u{2588}",
                         Phase::Break => "\u{2588}",
                         Phase::LongBreak => "\u{2588}\u{2588}\u{2588}",
@@ -198,7 +198,7 @@ fn main() -> Result<(), io::Error> {
             let minutes_remaining = (remaining_seconds / 60.) as i32;
             let seconds_remaining = remaining_seconds as i32 % 60;
             let mut time_text =
-                text::Span::raw(format!("{}:{}", minutes_remaining, seconds_remaining));
+                text::Span::raw(format!("{:02}:{:02}", minutes_remaining, seconds_remaining));
             time_text.style.fg = get_text_color(phase, minutes_remaining);
 
             let time_paragraph = Paragraph::new(time_text).alignment(Alignment::Center);
@@ -215,6 +215,15 @@ fn main() -> Result<(), io::Error> {
             f.render_widget(pie, chunks[0]);
             f.render_widget(time_paragraph, chunks[1]);
             f.render_widget(progress_paragraph, chunks[2]);
+            if minutes_remaining < 1 && !played_warning {
+                if let Ok(file) = File::open("warning.mp3") {
+                    let (_stream, stream_handle) = rodio::OutputStream::try_default().unwrap();
+                    let source = rodio::Decoder::new(BufReader::new(file)).unwrap();
+                    stream_handle.play_raw(source.convert_samples()).unwrap();
+                    sleep(Duration::new(2, 0));
+                };
+                played_warning = true;
+            }
         })?;
         sleep(Duration::from_secs_f32(0.3)); //Update once a second
     }
