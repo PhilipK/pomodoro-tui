@@ -228,14 +228,14 @@ fn main() -> Result<(), io::Error> {
     }
     terminal.clear()?;
 
-    Notification::new()
+    //If this fails it is fine, just don't show the notificatoin then
+    let _ = Notification::new()
         .summary("Pomodoro done")
         .body(format!("Your {} is over", phase.name()).as_str())
         .icon("pomodoro-tui")
         .appname("pomodoro-tui")
         .timeout(0) // this however is
-        .show()
-        .unwrap();
+        .show();
 
     // Load a sound from a file, using a path relative to Cargo.toml
     if let Ok(file) = File::open("ding.mp3") {
